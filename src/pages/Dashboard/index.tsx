@@ -1,138 +1,137 @@
-import { Link } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
+import { Link } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 
-import { AppLayout } from "@/layouts/AppLayout";
-import { PageHeader } from "@/components/common/PageHeader";
-import { DashboardOverviewGrid } from "@/components/dashboard/DashboardOverviewGrid";
-import { ChartCard } from "@/components/common/ChartCard";
-import { EmptyState } from "@/components/common/EmptyState";
-import { LoadingSkeleton } from "@/components/common/LoadingSkeleton";
+import { AppLayout } from '@/layouts/AppLayout';
 
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { EmptyState } from '@/components/common/EmptyState';
+import { LoadingSkeleton } from '@/components/common/LoadingSkeleton';
+
+import { Button } from '@/components/ui/button';
 
 import {
   Building2,
   BarChart3,
   Sparkles,
-} from "lucide-react";
+  Leaf,
+  Zap,
+  Sun,
+  Recycle,
+  TrendingDown,
+  ArrowUpRight,
+  Bot,
+  ShieldCheck,
+} from 'lucide-react';
 
-import {
-  PieChart,
-  Pie,
-  Cell,
-  Tooltip,
-  ResponsiveContainer,
-} from "recharts";
 
 import {
   getMyCompany,
+  listEmissions,
   listEnergy,
   listInsights,
   listNotifications,
-} from "@/services/company";
+} from '@/services/company';
 
-import { listDocuments } from "@/services/documents";
-import { getCarbonSummary } from "@/services/carbon";
 
-import { NotificationCard } from "@/components/notifications/NotificationCard";
+import { NotificationCard } from '@/components/notifications/NotificationCard';
+
+import { formatNumber } from '@/utils/format';
+
+
+import { KpiCard } from '@/components/dashboard/KpiCard';
+import { EmissionsTrendChart } from '@/components/dashboard/EmissionsTrendChart';
+import { EmissionBreakdown } from '@/components/dashboard/EmissionBreakdown';
+import { EnergyMixChart } from '@/components/dashboard/EnergyMixChart';
+import { AIInsightsCard } from '@/components/dashboard/AIInsightsCard';
+
 
 
 export default function DashboardPage() {
 
 
   const company = useQuery({
-    queryKey: ["my-company"],
-    queryFn: getMyCompany,
+    queryKey:['my-company'],
+    queryFn:getMyCompany
   });
+
 
 
   const companyId = company.data?.id;
 
 
 
-  const documents = useQuery({
-    queryKey: ["dashboard", "documents", companyId],
-    queryFn: () => listDocuments(companyId!),
-    enabled: !!companyId,
-  });
+  const emissions = useQuery({
 
-
-
-  const latestDocumentId =
-    documents.data?.[0]?.id;
-
-
-
-  const carbonSummary = useQuery({
-    queryKey: [
-      "dashboard",
-      "carbon-summary",
-      latestDocumentId,
+    queryKey:[
+      'dashboard',
+      'emissions',
+      companyId
     ],
 
-    queryFn: () =>
-      getCarbonSummary(latestDocumentId!),
+    queryFn:()=>listEmissions(companyId!),
 
-    enabled: !!latestDocumentId,
+    enabled:!!companyId
+
   });
 
 
 
   const energy = useQuery({
-    queryKey: [
-      "dashboard",
-      "energy",
-      companyId,
+
+    queryKey:[
+      'dashboard',
+      'energy',
+      companyId
     ],
 
-    queryFn: () =>
-      listEnergy(companyId!),
+    queryFn:()=>listEnergy(companyId!),
 
-    enabled: !!companyId,
+    enabled:!!companyId
+
   });
 
 
 
   const insights = useQuery({
-    queryKey: [
-      "dashboard",
-      "insights",
-      companyId,
+
+    queryKey:[
+      'dashboard',
+      'insights',
+      companyId
     ],
 
-    queryFn: () =>
-      listInsights(companyId!),
+    queryFn:()=>listInsights(companyId!),
 
-    enabled: !!companyId,
+    enabled:!!companyId
+
   });
 
 
 
   const notifs = useQuery({
-    queryKey: [
-      "dashboard",
-      "notifs",
+
+    queryKey:[
+      'dashboard',
+      'notifs'
     ],
 
-    queryFn:
-      listNotifications,
+    queryFn:listNotifications
+
   });
 
 
 
 
-  if (company.isLoading) {
+
+  if(company.isLoading){
 
     return (
+
       <AppLayout>
-        <LoadingSkeleton rows={4} />
+
+        <LoadingSkeleton rows={4}/>
+
       </AppLayout>
+
     );
 
   }
@@ -140,7 +139,9 @@ export default function DashboardPage() {
 
 
 
-  if (!company.data) {
+
+
+  if(!company.data){
 
     return (
 
@@ -148,35 +149,43 @@ export default function DashboardPage() {
 
         <div className="space-y-8">
 
-          <PageHeader
-            title="Sustainability Dashboard"
-            description="Real-time view of emissions, energy, water and waste."
-          />
+          <div className="hero-aurora p-8 md:p-10">
 
 
-          <Card>
-
-            <CardHeader>
-
-              <CardTitle>
-                Set up your company
-              </CardTitle>
-
-            </CardHeader>
+            <div className="relative z-10 max-w-2xl space-y-3">
 
 
-            <CardContent className="space-y-4">
+              <span className="chip-emerald">
 
-              <p className="text-sm text-muted-foreground">
-                Create your company profile to start tracking emissions and unlock insights.
+                <Leaf className="h-3 w-3"/>
+
+                CarbonIQ · Intelligence Platform
+
+              </span>
+
+
+
+              <h1 className="text-3xl md:text-4xl font-bold">
+
+                Set up your company to unlock carbon intelligence.
+
+              </h1>
+
+
+
+              <p className="text-muted-foreground">
+
+                Create your organization profile to start measuring emissions and receiving AI recommendations.
+
               </p>
+
 
 
               <Button asChild>
 
                 <Link to="/company">
 
-                  <Building2 className="h-4 w-4 mr-2" />
+                  <Building2 className="h-4 w-4"/>
 
                   Create company profile
 
@@ -185,12 +194,14 @@ export default function DashboardPage() {
               </Button>
 
 
-            </CardContent>
+            </div>
 
-          </Card>
+
+          </div>
 
 
         </div>
+
 
       </AppLayout>
 
@@ -202,431 +213,522 @@ export default function DashboardPage() {
 
 
 
+
+
+  const emissionRows = emissions.data ?? [];
+
+  const energyRows = energy.data ?? [];
+
+
+
   const totalCo2e = Math.round(
-    Number(
-      carbonSummary.data?.totalCarbon ?? 0
+
+    emissionRows.reduce(
+
+      (sum:any,row:any)=>
+
+      sum + Number(row.carbon_tonnes ?? 0),
+
+      0
+
     )
+
   );
 
 
 
-  const carbonBreakdown = [
+  const totalKwh = energyRows.reduce(
 
-    {
-      name: "Electricity",
-      value:
-        carbonSummary.data?.breakdown?.electricity ?? 0,
-    },
+    (sum:any,row:any)=>
 
-    {
-      name: "Fuel",
-      value:
-        carbonSummary.data?.breakdown?.fuel ?? 0,
-    },
+    sum + Number(row.electricity_kwh ?? 0),
 
-    {
-      name: "Water",
-      value:
-        carbonSummary.data?.breakdown?.water ?? 0,
-    },
+    0
 
-    {
-      name: "Waste",
-      value:
-        carbonSummary.data?.breakdown?.waste ?? 0,
-    },
-
-  ];
+  );
 
 
 
+  const totalRenewable = energyRows.reduce(
 
-  const totalKwh =
-    (energy.data ?? [])
-      .reduce(
-        (
-          sum,
-          row:any
-        ) =>
-          sum +
-          Number(
-            row.electricity_kwh ?? 0
-          ),
+    (sum:any,row:any)=>
 
-        0
-      );
+    sum + Number(row.renewable_kwh ?? 0),
+
+    0
+
+  );
 
 
 
   const totalEnergyMwh =
-    Math.round(
-      totalKwh / 1000
-    );
+    Math.round(totalKwh/1000);
 
 
 
   const renewablePct =
     totalKwh > 0
+    ? Math.round((totalRenewable/totalKwh)*100)
+    : 0;
 
-      ?
 
-      Math.round(
 
-        (
 
-          (
-            energy.data ?? []
-          )
-          .reduce(
-            (
-              sum,
-              row:any
-            ) =>
-              sum +
-              Number(
-                row.renewable_kwh ?? 0
-              ),
+  const wasteTonnes = Math.round(
 
-            0
-          )
+    emissionRows
 
-          /
+    .filter((r:any)=>
 
-          totalKwh
+      /waste/i.test(
 
-        )
-
-        *
-
-        100
+        `${r.emission_type ?? ''} ${r.source ?? ''}`
 
       )
 
-      :
+    )
 
-      0;
+    .reduce(
 
+      (sum:any,row:any)=>
 
+      sum + Number(row.carbon_tonnes ?? 0),
 
+      0
 
+    )
 
+    *10
 
-  return (
+  )/10;
 
-    <AppLayout>
 
 
-      <div className="space-y-8">
 
 
-        <PageHeader
 
-          title={`Welcome, ${company.data.company_name}`}
 
-          description="Real-time view of your sustainability performance."
+return (
 
-        />
+<AppLayout>
 
 
+<div className="space-y-8">
 
 
-        <DashboardOverviewGrid
 
-          totalCo2e={totalCo2e}
+<section className="hero-aurora p-6 md:p-8">
 
-          totalEnergyMwh={totalEnergyMwh}
 
-          totalWaterM3={0}
+<div className="flex flex-col md:flex-row md:justify-between gap-4">
 
-          totalWasteKg={renewablePct}
 
-        />
+<div>
 
 
+<div className="flex gap-2">
 
 
+<span className="chip-emerald">
 
+<Leaf className="h-3 w-3"/>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+Sustainability Intelligence
 
+</span>
 
 
 
+<span className="chip-emerald">
 
-          <ChartCard
+<ShieldCheck className="h-3 w-3"/>
 
-            title="Carbon Emission Breakdown"
+{company.data.industry || "Enterprise"}
 
-            description="Source-wise contribution of your carbon footprint."
+</span>
 
-          >
 
-            <div className="h-72">
+</div>
 
-              <ResponsiveContainer
-                width="100%"
-                height="100%"
-              >
 
-                <PieChart>
 
+<h1 className="text-3xl font-bold mt-3">
 
-                  <Pie
+Welcome back,
 
-                    data={carbonBreakdown}
+<span className="text-primary ml-2">
 
-                    dataKey="value"
+{company.data.company_name}
 
-                    nameKey="name"
+</span>
 
-                    outerRadius={100}
 
-                    label
+</h1>
 
-                  >
 
-                    {
 
-                      carbonBreakdown.map(
-                        (item) => (
+<p className="text-muted-foreground mt-2">
 
-                          <Cell
-                            key={item.name}
-                          />
+Monitor carbon performance and reduce emissions using AI.
 
-                        )
+</p>
 
-                      )
 
-                    }
 
+</div>
 
-                  </Pie>
 
 
-                  <Tooltip />
+<div className="flex gap-2">
 
 
-                </PieChart>
+<Button asChild variant="outline">
 
+<Link to="/uploads">
 
-              </ResponsiveContainer>
+Upload data
 
+</Link>
 
-            </div>
+</Button>
 
 
-          </ChartCard>
 
+<Button asChild>
 
+<Link to="/insights">
 
+<Bot className="h-4 w-4"/>
 
+AI Advisor
 
+</Link>
 
+</Button>
 
-          <ChartCard
 
-            title="Latest AI insights"
 
-            description="Model-generated recommendations for your company."
+</div>
 
-          >
 
 
-            {
+</div>
 
-              insights.isLoading
 
-              ?
+</section>
 
-              <LoadingSkeleton rows={3}/>
 
 
-              :
 
 
-              (insights.data ?? []).length === 0
 
 
-              ?
+<section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
 
-              <EmptyState
 
-                icon={Sparkles}
+<KpiCard
+label="Total Carbon Footprint"
+value={formatNumber(totalCo2e)}
+unit="t CO₂e"
+hint="All emissions"
+icon={Leaf}
+accent="emerald"
+/>
 
-                title="No insights yet"
 
-                description="Insights appear once data is ingested and analyzed."
+<KpiCard
+label="Energy Consumption"
+value={formatNumber(totalEnergyMwh)}
+unit="MWh"
+hint="Total energy"
+icon={Zap}
+accent="amber"
+/>
 
-              />
 
+<KpiCard
+label="Renewable Energy"
+value={`${renewablePct}`}
+unit="%"
+hint="Clean energy"
+icon={Sun}
+accent="emerald"
+/>
 
-              :
 
+<KpiCard
+label="Waste Impact"
+value={formatNumber(wasteTonnes)}
+unit="t CO₂e"
+hint="Waste emissions"
+icon={Recycle}
+accent="slate"
+/>
 
-              <ul className="space-y-3">
 
-                {
+</section>
 
-                  (insights.data ?? [])
-                  .slice(0,3)
-                  .map(
-                    (i:any)=>(
 
-                      <li
 
-                        key={i.id}
 
-                        className="rounded-md border border-border p-3"
 
-                      >
 
-                        <p className="text-sm font-medium">
 
-                          {i.insight}
 
-                        </p>
+<section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
 
-                        {
+<div className="glass-card p-5 lg:col-span-2">
 
-                          i.recommendation &&
 
-                          <p className="text-xs text-muted-foreground mt-1">
+<h3 className="font-semibold flex gap-2">
 
-                            {i.recommendation}
+<TrendingDown className="h-4 w-4"/>
 
-                          </p>
+Emission Trend
 
-                        }
+</h3>
 
 
-                      </li>
+{emissions.isLoading
 
-                    )
+?
 
-                  )
+<LoadingSkeleton rows={4}/>
 
-                }
+:
 
+<EmissionsTrendChart data={emissionRows as any}/>
 
-              </ul>
+}
 
 
-            }
+</div>
 
 
-          </ChartCard>
 
 
 
+<div className="glass-card p-5">
 
 
+<h3 className="font-semibold">
 
+Energy Mix
 
-          <ChartCard
+</h3>
 
-            title="Recent alerts"
 
-            description="Notifications from your workspace."
+{energy.isLoading
 
-          >
+?
 
-            {
+<LoadingSkeleton rows={4}/>
 
-              notifs.isLoading
+:
 
+<EnergyMixChart data={energyRows as any}/>
 
-              ?
+}
 
 
-              <LoadingSkeleton rows={3}/>
+</div>
 
 
-              :
 
+</section>
 
-              (notifs.data ?? []).length === 0
 
 
-              ?
 
 
-              <EmptyState
 
-                icon={BarChart3}
 
-                title="You're all caught up"
 
-                description="No new alerts."
+<section className="glass-card p-6">
 
-              />
 
+<h3 className="font-semibold mb-4">
 
-              :
+Carbon Emission Breakdown
 
+</h3>
 
-              <div className="space-y-3">
 
-                {
+<EmissionBreakdown data={emissionRows as any}/>
 
-                  (notifs.data ?? [])
-                  .slice(0,4)
-                  .map(
-                    (n:any)=>(
 
-                      <NotificationCard
+</section>
 
-                        key={n.id}
 
-                        notification={{
 
-                          id:n.id,
 
-                          title:n.title,
 
-                          message:n.message,
 
-                          kind:
-                            n.category ?? "info",
 
-                          read:
-                            n.status === "read",
 
-                          createdAt:
-                            n.created_at,
 
-                        }}
+<section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
-                      />
 
-                    )
 
-                  )
+<div>
 
-                }
 
+{
 
-              </div>
+insights.isLoading
 
+?
 
-            }
+<LoadingSkeleton rows={4}/>
 
 
-          </ChartCard>
+:
 
+(insights.data ?? []).length === 0
 
 
+?
 
+<EmptyState
 
-        </div>
+icon={Sparkles}
 
+title="No AI insights yet"
 
-      </div>
+description="Upload data to generate AI recommendations."
 
+/>
 
-    </AppLayout>
 
-  );
+:
+
+<AIInsightsCard
+
+data={(insights.data ?? [])[0]}
+
+/>
+
+
+}
+
+
+</div>
+
+
+
+
+
+
+
+
+<div className="glass-card p-5">
+
+
+<div className="flex justify-between mb-4">
+
+
+<div>
+
+<h3 className="font-semibold">
+
+Recent Alerts
+
+</h3>
+
+
+<p className="text-xs text-muted-foreground">
+
+Workspace notifications
+
+</p>
+
+
+</div>
+
+
+<Link to="/notifications">
+
+<ArrowUpRight className="h-4 w-4"/>
+
+</Link>
+
+
+</div>
+
+
+
+
+{
+
+(notifs.data ?? []).length === 0
+
+?
+
+<EmptyState
+
+icon={BarChart3}
+
+title="You're all caught up"
+
+description="No alerts."
+
+/>
+
+
+:
+
+(notifs.data ?? []).slice(0,4).map((n:any)=>(
+
+
+<NotificationCard
+
+key={n.id}
+
+notification={{
+
+id:n.id,
+
+title:n.title,
+
+message:n.message,
+
+kind:n.category ?? "info",
+
+read:n.status==="read",
+
+createdAt:n.created_at
+
+}}
+
+/>
+
+
+))
+
+
+}
+
+
+
+</div>
+
+
+
+</section>
+
+
+
+
+
+
+</div>
+
+
+</AppLayout>
+
+);
+
 
 }
